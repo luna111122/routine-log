@@ -1,4 +1,4 @@
-package routine.log.controller;
+package routine.log;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -9,7 +9,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class transss {
+public class Transmission {
 
 
 
@@ -19,3 +19,7 @@ public class transss {
 
 
 }
+
+
+
+
