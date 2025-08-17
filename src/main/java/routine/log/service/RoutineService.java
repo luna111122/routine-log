@@ -3,15 +3,16 @@ package routine.log.service;
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import routine.log.State;
 import routine.log.domain.Place;
 import routine.log.domain.Routine;
 import routine.log.domain.Time;
 import routine.log.domain.User;
 import routine.log.dto.routine.RoutineCreateRequestDto;
-import routine.log.exception.routine.RoutineNotFoundException;
+import routine.log.exception.CreationException;
+import routine.log.exception.NotFoundException;
 import routine.log.repository.RoutineRepository;
 
 import java.time.DayOfWeek;
@@ -19,7 +20,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -29,14 +29,14 @@ public class RoutineService {
     final private RoutineRepository routineRepository;
 
     @Transactional
-    public Long createRoutine(RoutineCreateRequestDto requestDto, Optional<User> user, Place place, Time time, LocalDate date) {
+    public Routine createRoutine(RoutineCreateRequestDto requestDto, User user, Place place, Time time, LocalDate date) {
 
 
 
         Routine routine = Routine.builder()
                 .title(requestDto.getTitle())
                 .location(requestDto.getLocation())
-                .user(user.orElseThrow(() -> new IllegalArgumentException("User가 존재하지 않습니다")))
+                .user(user)
                 .place(place)
                 .time(time)
                 .startDate(date)
@@ -45,11 +45,26 @@ public class RoutineService {
 
         routine.setWeekdays(requestDto.getDayofWeekSet());
 
-        Routine saved = routineRepository.save(routine);
 
-        log.info("루틴 생성 id={}", saved.getId());
 
-        return saved.getId();
+
+        try {
+            return routineRepository.save(routine);
+        } catch (DataAccessException e) {
+            String msg = String.format(
+                    "Routine 생성 실패: DB 저장 중 예외 발생 (title=%s, location=%s, userId=%d, placeId=%d, timeId=%d, startDate=%s)",
+                    requestDto.getTitle(),
+                    requestDto.getLocation(),
+                    user.getId(),
+                    place.getId(),
+                    time.getId(),
+                    date
+            );
+            log.error(msg, e);
+            throw new CreationException(msg, e);
+        }
+
+
 
     }
 
@@ -58,7 +73,7 @@ public class RoutineService {
 
 
         Routine routine = routineRepository.findById(routineId)
-                .orElseThrow(() -> new RoutineNotFoundException("루틴이 존재하지 않습니다. id=" + routineId));
+                .orElseThrow(() -> new NotFoundException("루틴이 존재하지 않습니다. id=" + routineId));
 
         if (date.isBefore(routine.getStartDate())) {
             date = routine.getStartDate();
@@ -87,11 +102,17 @@ public class RoutineService {
     }
 
     @Transactional
-    public List<Routine> getTodayRoutines(User user, @Nullable LocalDate date){
+    public List<Routine> getTodayRoutines(User user, @Nullable LocalDate date) {
+
+        // 만약 date 가 null 이면 현재 날짜를 사용한다
         LocalDate target = (date != null)
                 ? date
                 : ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toLocalDate();
+
+
         DayOfWeek day = target.getDayOfWeek();
-        return routineRepository.findDaily(user.getId(), day,target);
+
+        // 특정 사용자의 타겟 날짜 / 요일에 유효한 루틴들을, 시작 시간순서로 가져옴
+        return routineRepository.findDaily(user.getId(), day, target);
     }
 }

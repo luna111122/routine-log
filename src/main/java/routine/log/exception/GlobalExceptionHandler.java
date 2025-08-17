@@ -6,19 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import routine.log.exception.routine.RoutineNotFoundException;
-import routine.log.exception.user.UserNotFoundException;
+
 
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    @ExceptionHandler(RoutineNotFoundException.class)
-    public ResponseEntity<?> handlerNotFound(RoutineNotFoundException e) {
-        log.warn("NotFound: {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidation(MethodArgumentNotValidException e) {
@@ -26,10 +19,34 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().build();
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<?> handlerNotFound(NotFoundException e) {
+        log.warn("NotFound: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFound(UserNotFoundException e) {
+
+
+    @ExceptionHandler(CreationException.class)
+    public ResponseEntity<String> handlePlaceNotCreated(CreationException e) {
         log.warn("{}",e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
+
+    @ExceptionHandler(RangeException.class)
+    public ResponseEntity<String> handleNotInRange(RangeException e) {
+        log.warn("{}",e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleNotInRange(IllegalArgumentException e) {
+        log.warn("{}",e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+
+
+
+
 }

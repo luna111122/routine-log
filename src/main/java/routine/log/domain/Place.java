@@ -24,7 +24,7 @@ public class Place {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "POINT")
+    @Column(columnDefinition = "POINT", nullable = false)
     @JdbcTypeCode(SqlTypes.GEOMETRY)
     private Point center;
 

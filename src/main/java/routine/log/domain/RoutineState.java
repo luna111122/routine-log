@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "routine_status")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder

@@ -14,9 +14,8 @@ import routine.log.State;
 import routine.log.domain.*;
 
 import routine.log.dto.routine.RoutineCreateRequestDto;
-import routine.log.dto.routine.RoutineDeleteRequestDto;
 import routine.log.dto.routine.RoutinesGetResponseDto;
-import routine.log.exception.user.UserNotFoundException;
+import routine.log.exception.NotFoundException;
 import routine.log.repository.RoutineStateRepository;
 import routine.log.repository.UserRepository;
 import routine.log.service.PlaceService;
@@ -24,10 +23,8 @@ import routine.log.service.RoutineService;
 import routine.log.service.TimeService;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -55,21 +52,26 @@ public class RoutineController {
         log.info("POST /routines by user={}, title={}, location={}, latitude={}, longitude={}",
                 username, requestDto.getTitle(), requestDto.getLocation(), requestDto.getLatitude(),requestDto.getLongitude());
 
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(
+                        "사용자를 찾을 수 없습니다. username=" + username));
+
 
 
         Place place = placeService.createPlace(requestDto);
-        log.info("POST /routines success Place id={}", place.getId());
+        log.info("POST /routines success place id={}", place.getId());
+
+
 
         Time time = timeService.createTime(requestDto);
-        log.info("POST /routines success Time id={}", place.getId());
+        log.info("POST /routines success Time id={}", time.getId());
 
 
-        Long id = routineService.createRoutine(requestDto, user,place,time, startDate);
-        log.info("POST /routines success id={}", id);
+        Routine routine = routineService.createRoutine(requestDto, user,place,time, startDate);
+        log.info("POST /routines success id={}", routine.getId());
 
 
-        Map<String, Long> response = Map.of("routineId", id);
+        Map<String, Long> response = Map.of("routineId", routine.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
@@ -96,11 +98,12 @@ public class RoutineController {
         log.info("GET /routines username={}",username);
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다. username=" + username));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다. username=" + username));
 
 
         List<Routine> today = routineService.getTodayRoutines(user,date);
 
+        log.info("GET /routines 조회된 루틴의 갯수={}",today.size());
 
 
         List<Long> ids = today.stream().map(Routine::getId).toList();

@@ -7,9 +7,10 @@ import lombok.Getter;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+
 @Getter
 @AllArgsConstructor
-public class FilterRequestDto {
+public class CurrentRequestDto {
 
     @NotNull
     private Integer latitude;
@@ -22,5 +23,4 @@ public class FilterRequestDto {
 
     @NotNull
     private LocalDate currentDate;
-
 }

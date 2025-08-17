@@ -2,6 +2,7 @@ package routine.log.dto.routine;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 
@@ -21,15 +22,17 @@ public class RoutineCreateRequestDto {
     @NotBlank(message = "위치는 필수입니다.")
     private String location;
 
-    @NotBlank
+    @NotNull
     private Integer latitude;
 
-    @NotBlank
+    @NotNull
     private Integer longitude;
 
     @JsonFormat(pattern = "HH:mm")
+    @NotNull
     private LocalTime startTime;
 
+    @NotNull
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
 

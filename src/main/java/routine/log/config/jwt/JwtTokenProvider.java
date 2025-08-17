@@ -31,7 +31,6 @@ public class JwtTokenProvider {
         Instant now = Instant.now();
         return Jwts.builder()
                 .subject(username)
-
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusSeconds(expireSeconds)))
                 .signWith(key)
@@ -46,9 +45,7 @@ public class JwtTokenProvider {
             return false;
         }
     }
-    public String getUserId(String token) {
-        return parseClaims(token).get("userId", String.class);
-    }
+
 
     public String getUsername(String token){
         return parseClaims(token).getSubject();

@@ -1,6 +1,8 @@
 package routine.log.service;
 
+import lombok.extern.slf4j.Slf4j;
 import routine.log.domain.User;
+import routine.log.exception.NotFoundException;
 import routine.log.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,6 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserDetailService implements org.springframework.security.core.userdetails.UserDetailsService {
 
     private final UserRepository userRepository;
@@ -21,7 +24,7 @@ public class UserDetailService implements org.springframework.security.core.user
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
         User u = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
+                .orElseThrow(() -> new NotFoundException(username));
 
         return new org.springframework.security.core.userdetails.User(
                 u.getUsername(),
@@ -40,6 +43,9 @@ public class UserDetailService implements org.springframework.security.core.user
                 .password(passwordEncoder.encode(rawPassword))
                 .build();
 
+
+        log.info("회원가입 완료 userId: {}", u.getId());
+
         userRepository.save(u);
     }
 
@@ -47,11 +53,15 @@ public class UserDetailService implements org.springframework.security.core.user
         User u = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
 
+        Long id = u.getId();
+
         if (!passwordEncoder.matches(rawPassword, u.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
         userRepository.delete(u);
+
+        log.info("회원탈퇴 완료 userId: {}", id);
     }
 
 
