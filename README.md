@@ -53,7 +53,7 @@ Backend: Spring Boot (Java), REST API
 
 DB: MySQL
 
-Infra (AWS): Route 53, CloudFront, S3(정적 호스팅), ALB, EC2, RDS(MySQL), ACM(SSL)
+Infra (AWS): CloudFront, S3(정적 호스팅), ALB, EC2, RDS(MySQL), ACM(SSL)
 
 기타: Geolocation API
 
