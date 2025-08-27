@@ -47,7 +47,7 @@ Geolocation API + 좌표 반경(예: 100m) 기반 인식
 
 🛠 기술 스택
 
-Frontend: React (CRA)   @seohyun1257
+Frontend: React (CRA)   
 
 Backend: Spring Boot (Java), REST API
 
