@@ -1,9 +1,9 @@
 루틴로그 (프로토타입)
 
 ## 👥 담당자
-| 역할 | 이름/프로필 | 메모 |
-|---|---|---|
-| FE | [@fe-dev](https://github.com/fe-dev) 
+| 역할 | 이름/프로필 |
+|---|---|
+| FE | [@fe-dev](https://github.com/seohyun1257) 
 | BE | [@luna111122](https://github.com/luna111122) 
 
 사용자의 루틴을 일관되게 기록하고, 동기부여/회고를 통해 성장을 돕는 웹 기반 루틴 기록 플랫폼
